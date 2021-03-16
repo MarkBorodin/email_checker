@@ -1,0 +1,42 @@
+version: "3.3"
+
+services:
+  backend:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/srv
+      - static_content:/var/www/email_checker
+    ports:
+      - 8020:8000
+  nginx:
+    image: nginx:1.19-alpine
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - static_content:/var/www/email_checker
+    ports:
+      - 80:80
+      - 444:443
+    depends_on:
+      - backend
+
+  redis:
+    image: redis
+    env_file: .env
+    restart: always
+
+  celery:
+    env_file: .env
+    build: .
+    command: celery -A app worker --loglevel=debug --concurrency=4
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=app.settings
+    volumes:
+      - .:/srv
+
+volumes:
+  pgdata: {}
+  static_content: {}
