@@ -28,3 +28,11 @@ class Email(BaseModel):
     accessible = models.BooleanField(null=True, blank=True, default=False)
     catchall = models.BooleanField(null=True, blank=True, default=False)
     csv_file = models.ForeignKey(to=CSVFile, related_name='emails', on_delete=models.CASCADE)
+
+
+class APIEmail(BaseModel):
+    """model email for api (no relations with csv file)"""
+    email = models.TextField(max_length=256)
+    valid = models.BooleanField(null=True, blank=True, default=False)
+    accessible = models.BooleanField(null=True, blank=True, default=False)
+    catchall = models.BooleanField(null=True, blank=True, default=False)
