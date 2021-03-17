@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 API_PREFIX = 'api/v1'
 
@@ -10,7 +11,7 @@ urlpatterns = [
 
 
     # API
-    path(f'{API_PREFIX}', include('email_checker.api.urls')),
-    # path(f'{API_PREFIX}/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # path(f'{API_PREFIX}/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path(f'{API_PREFIX}/', include('email_checker.api.urls')),
+    path(f'{API_PREFIX}/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path(f'{API_PREFIX}/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

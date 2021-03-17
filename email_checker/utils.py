@@ -5,7 +5,7 @@ import re
 import smtplib
 import sys
 from typing import List
-
+from pyisemail import is_email
 import dns.resolver
 from django.core.mail import send_mail
 from googleapiclient import discovery
@@ -19,72 +19,59 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def check_email_valid(email):
-    # Simple Regex for syntax checking
-    regex = '^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$'  # noqa
-
-    # Email address to verify
-    address_to_verify = str(email)
-
-    # Syntax check
-    if re.search(regex, address_to_verify):
-        return True
-    else:
-        return False
-
-    # third party library
-    # check = validate_email(
-    #     email_address=email,
-    #     check_format=True,
-    # )
-    # return check
+    bool_result = is_email(email)
+    return bool_result
 
 
 def check_email_accessible(email):
-    check = validate_email(
-        email_address=email,
-        check_format=True,
-        check_smtp=True, smtp_timeout=10,
-        check_dns=True, dns_timeout=10,
-        smtp_from_address=EMAIL_HOST_USER,
-    )
-    return check
-
-    # try:
-    #
-    #     from_address = EMAIL_HOST_USER
-    #
-    #     # Get domain for DNS lookup
-    #     domain = email.split('@')[-1]
-    #
-    #     # experimental part
-    #     # we make a deliberately non-existent email with the required domain
-    #     # first_part, second_part = email.split('@')
-    #     # fake_email = first_part + 'ashdfabebdfjksjakuahfka' + '@' + second_part
-    #
-    #     # MX record lookup
-    #     records = dns.resolver.resolve(domain, 'MX')
-    #     mx_record = records[0].exchange
-    #     mx_record = str(mx_record)
-    #
-    #     # SMTP lib setup (use debug level for full output)
-    #     server = smtplib.SMTP()
-    #     server.set_debuglevel(0)
-    #
-    #     # SMTP Conversation
-    #     server.connect(mx_record)
-    #     server.helo(server.local_hostname)  # server.local_hostname(Get local server hostname)
-    #     server.mail(from_address)
-    #     code, message = server.rcpt(str(email))
-    #     server.quit()
-    #
-    #     # Assume SMTP response 250 is success
-    #     if code == 250:
-    #         return True
-    #     else:
-    #         return False
-    #
-    # except Exception:
+    # check = validate_email(
+    #     email_address=email,
+    #     # check_format=True,
+    #     check_smtp=True, smtp_timeout=10,
+    #     check_dns=True, dns_timeout=10,
+    #     smtp_from_address=EMAIL_HOST_USER,
+    # )
+    # if check is True or False:
+    #     return check
+    # else:
     #     return False
+
+    try:
+
+        from_address = EMAIL_HOST_USER
+
+        # Get domain for DNS lookup
+        domain = email.split('@')[-1]
+
+        # experimental part
+        # we make a deliberately non-existent email with the required domain
+        # first_part, second_part = email.split('@')
+        # fake_email = first_part + 'ashdfabebdfjksjakuahfka' + '@' + second_part
+
+        # MX record lookup
+        records = dns.resolver.resolve(domain, 'MX')
+        mx_record = records[0].exchange
+        mx_record = str(mx_record)
+
+        # SMTP lib setup (use debug level for full output)
+        server = smtplib.SMTP()
+        server.set_debuglevel(0)
+
+        # SMTP Conversation
+        server.connect(mx_record)
+        server.helo(server.local_hostname)  # server.local_hostname(Get local server hostname)
+        server.mail(from_address)
+        code, message = server.rcpt(str(email))
+        server.quit()
+
+        # Assume SMTP response 250 is success
+        if code == 250:
+            return True
+        else:
+            return False
+
+    except Exception:
+        return False
 
 
 def check_email_catchall(email):

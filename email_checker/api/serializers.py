@@ -9,6 +9,15 @@ class APIEmailSerializer(serializers.ModelSerializer):
         model = APIEmail
         fields = (
             'email',
+        )
+
+
+class APIEmailSerializerResponse(serializers.ModelSerializer):
+
+    class Meta:
+        model = APIEmail
+        fields = (
+            'email',
             'valid',
             'accessible',
             'catchall',
